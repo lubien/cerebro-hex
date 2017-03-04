@@ -1,4 +1,5 @@
 'use strict';
+const debounce = require('p-debounce')
 const {memoize} = require('cerebro-tools')
 const {compareTwoStrings} = require('string-similarity')
 const icon = require('../icon.png')
@@ -13,10 +14,11 @@ const map = f => xs => xs.map(f)
 
 const sort = f => xs => xs.sort(f)
 
-const fetchAll = memoize(name =>
-  fetch(`${endpoint}?search=${encodeURIComponent(name)}`)
-    .then(response => response.json())
-, memoizationSettings)
+const fetchAll = debounce(memoize(
+  name =>
+    fetch(`${endpoint}?search=${encodeURIComponent(name)}`)
+      .then(response => response.json())
+, memoizationSettings), 300)
 
 const packageToResult = actions => ({name, meta}) => {
   const url = `https://hex.pm/packages/${name}`
